@@ -30,9 +30,38 @@ public class MainSystem {
 
     //Solved by GPT (with copy and paste the statement from guidlines)
     public void concurrentRegistration(List<RegistrationAction> actions) {//Main4(cont'): jump from main
-        ExecutorService executor = Executors.newSingleThreadExecutor(); //[Concurrent Method]
 
+
+        int num_threads = actions.size();
+        Thread[] threads = new Thread[num_threads]; //Mulitprogramming Method
+
+        for(int i = 0; i < num_threads;i++){
+            if(i !=0)
+                try {threads[i-1].join();}catch (Exception e){} //Wait previous action to complete
+
+
+            RegistrationAction action = actions.get(i);//get current action
+            threads[i] = new Thread(()->{
+                Student student = action.getStudent(); //Get All data
+                Activity activity = action.getActivity();
+                RegistrationActionType actionType = action.getAction();
+
+                if(actionType.equals(RegistrationActionType.ENROLL)) //If action == ENROLL
+                    activity.enroll(student);
+                else if(actionType.equals(RegistrationActionType.DROP)) //If action == Drop
+                    activity.drop(student);
+
+                action.setCompleted(true); //Set the status = true
+            });
+
+            threads[i].start();
+        }
+
+            /*
+        ExecutorService executor = Executors.newSingleThreadExecutor(); //[Concurrent Method]
         for(RegistrationAction action: actions){
+
+
             executor.submit(()->{
                 Student student = action.getStudent(); //Get All data
                 Activity activity = action.getActivity();
@@ -45,7 +74,10 @@ public class MainSystem {
 
                 action.setCompleted(true); //Set the status = true
             });
+
         }
+
+             */
     }
 
 
