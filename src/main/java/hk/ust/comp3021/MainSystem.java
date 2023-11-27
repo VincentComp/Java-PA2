@@ -5,6 +5,8 @@ import hk.ust.comp3021.action.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainSystem {
     private final List<Student> students;
@@ -26,8 +28,27 @@ public class MainSystem {
      */
 
 
+    //Solved by GPT (with copy and paste the statement from guidlines)
     public void concurrentRegistration(List<RegistrationAction> actions) {//Main4(cont'): jump from main
+        ExecutorService executor = Executors.newSingleThreadExecutor(); //[Concurrent Method]
+
+        for(RegistrationAction action: actions){
+            executor.submit(()->{
+                Student student = action.getStudent(); //Get All data
+                Activity activity = action.getActivity();
+                RegistrationActionType actionType = action.getAction();
+
+                if(actionType.equals(RegistrationActionType.ENROLL)) //If action == ENROLL
+                    activity.enroll(student);
+                else if(actionType.equals(RegistrationActionType.DROP)) //If action == Drop
+                    activity.drop(student);
+
+                action.setCompleted(true); //Set the status = true
+            });
+        }
     }
+
+
 
     /**
      * TODO: Part 2 Task 3: Define interface EventHandler and make correct class implement it
