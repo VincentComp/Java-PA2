@@ -24,7 +24,9 @@ public class MainSystem {
     /**
      * TODO Part 1 Task 2: Implement this method
      */
-    public void concurrentRegistration(List<RegistrationAction> actions) {
+
+
+    public void concurrentRegistration(List<RegistrationAction> actions) {//Main4(cont'): jump from main
     }
 
     /**
@@ -124,7 +126,7 @@ public class MainSystem {
                 actions.add(new RegistrationAction(student, activity, actType));
             }
         }
-        concurrentRegistration(actions);
+        concurrentRegistration(actions); //Main4: prase Registration -> pass to concurrent
     }
 
     public void processManagement(String fileName) throws IOException {
@@ -163,11 +165,11 @@ public class MainSystem {
     public static void main(String[] args) throws IOException {
         System.out.println("=============== System Start ===============");
         MainSystem system = new MainSystem();
-        system.parseStudents("input/student.txt");
-        system.parseActivities("input/activity.txt");
+        system.parseStudents("input/student.txt"); //Main 1: parse the Students
+        system.parseActivities("input/activity.txt"); //Main 2: parse the Activities
         // Part 1: Parallel Registration
         System.out.println("=============== Part 1 ===============");
-        system.processRegistration("input/registrationActions.txt");
+        system.processRegistration("input/registrationActions.txt"); //Main3: process processRegistration
         System.out.println("Part 1 Finished");
         // Part 2: Sequential Event Management
         System.out.println("=============== Part 2 ===============");
