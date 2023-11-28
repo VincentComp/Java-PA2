@@ -29,11 +29,11 @@ public class MainSystem {
 
 
     //Solved by GPT (with copy and paste the statement from guidlines)
-    public void concurrentRegistration(List<RegistrationAction> actions) {//Main4(cont'): jump from main
+    public void concurrentRegistration(List<RegistrationAction> actions) {//Main3(cont'): jump from main
 
 
         int num_threads = actions.size();
-        Thread[] threads = new Thread[num_threads]; //Mulitprogramming Method
+        Thread[] threads = new Thread[num_threads]; //*****Mulitprogramming Method******
 
         for(int i = 0; i < num_threads;i++){
             if(i !=0)
@@ -88,19 +88,30 @@ public class MainSystem {
     /**
      * TODO: Part 2 Task 4: Define and implement class ActivityEvent that implements Event
      * */
-    public void addListener(EventHandler listener) {
+    public void addListener(EventHandler listener) { //Main4.1: add students to the this.listners
         listeners.add(listener);
     }
 
-    public void dispatchEvent(Event event) {
-        listeners.forEach(listener -> listener.onEvent(event));
+    public void dispatchEvent(Event event) {//Main4.3
+        listeners.forEach(listener -> listener.onEvent(event));//Invoke listener with the Activityevent
     }
 
     /**
      * TODO: Part 2 Task 5: Implement the following method for event handling.
      * You need to call dispatchEvent() in this method.
      * */
-    public void studentGetUpdate(ManagementAction action) {}
+    public void studentGetUpdate(ManagementAction action) { //Main4.2
+        Activity activity = action.getActivity();
+        ManagementActionType actionType = action.getAction();
+
+
+        if(actionType.equals(ManagementActionType.ACTIVITY_FINISHED)) //Student::C2/C3-T1/T1 -> Change state
+            activity.changeState(ActivityState.FINISHED);
+        else if(actionType.equals(ManagementActionType.ACTIVITY_CANCELLED))
+            activity.changeState(ActivityState.CANCELLED);
+
+        dispatchEvent(new ActivityEvent(activity,actionType)); //send action to the listeners
+    }
 
     /**
      * TODO: Part 3 Task 6: Implement getStudent(String studentID) and getActivity(String activityID) use lambda expression and/or functional programming
@@ -179,10 +190,10 @@ public class MainSystem {
                 actions.add(new RegistrationAction(student, activity, actType));
             }
         }
-        concurrentRegistration(actions); //Main4: prase Registration -> pass to concurrent
+        concurrentRegistration(actions); //Main3 con't: prase Registration -> pass to concurrent
     }
 
-    public void processManagement(String fileName) throws IOException {
+    public void processManagement(String fileName) throws IOException {//Main4(cont') jump from main
         List<ManagementAction> actions = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -191,12 +202,12 @@ public class MainSystem {
                 String activityCode = parts[0];
                 Activity activity = getActivity(activityCode);
                 ManagementActionType actType = ManagementActionType.valueOf(parts[1]);
-                actions.add(new ManagementAction(activity, actType));
+                actions.add(new ManagementAction(activity, actType)); //create an Action list
             }
         }
         // You need to have your implementation done to allow the following code to work
-        this.students.forEach(this::addListener);
-        actions.forEach(this::studentGetUpdate);
+        this.students.forEach(this::addListener); //Add all students to the listener list
+        actions.forEach(this::studentGetUpdate); //Call students GetUpdate with different actions
     }
 
     /**
@@ -226,7 +237,7 @@ public class MainSystem {
         System.out.println("Part 1 Finished");
         // Part 2: Sequential Event Management
         System.out.println("=============== Part 2 ===============");
-        system.processManagement("input/managementActions.txt");
+        system.processManagement("input/managementActions.txt"); //Main4: processManagement
         // Part 3: Functional Information Retrieval
         System.out.println("=============== Part 3 ===============");
         system.processQuery("input/queryActions.txt");
