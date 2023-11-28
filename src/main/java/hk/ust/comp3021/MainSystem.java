@@ -55,6 +55,9 @@ public class MainSystem {
             });
 
             threads[i].start();
+
+            if(num_threads == 1)
+                try{threads[0].join();}catch(Exception e){}//If there is 1 student only -> finsihed task 1 ,then task 2
         }
 
             /*
