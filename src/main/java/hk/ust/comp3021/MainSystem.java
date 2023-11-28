@@ -58,8 +58,10 @@ public class MainSystem {
 
             if(num_threads == 1)
                 try{threads[0].join();}catch(Exception e){}//If there is 1 student only -> finsihed task 1 ,then task 2
+
         }
 
+        try{threads[num_threads-1].join();}catch(Exception e){} //In case last thread doesn't join
             /*
         ExecutorService executor = Executors.newSingleThreadExecutor(); //[Concurrent Method]
         for(RegistrationAction action: actions){
