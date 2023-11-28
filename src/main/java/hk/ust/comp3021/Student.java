@@ -85,7 +85,7 @@ public class Student implements EventHandler {
             }
 
             if(actionType.equals(ManagementActionType.ACTIVITY_POSTPONED)){
-                System.out.println(this.getStudentID() + " is notified that Activity " + activity.getActivityID() + " has postponed.");//T1
+                System.out.println("Student " +this.getStudentID() + " is notified that Activity " + activity.getActivityID() + " has postponed.");//T1
 
             } else if (actionType.equals(ManagementActionType.ACTIVITY_FINISHED)){
 
@@ -94,12 +94,12 @@ public class Student implements EventHandler {
 
                 this.passedDuration += activity.getDuration(); //T3:Add Duration
 
-                System.out.println(this.getStudentID() + " is notified that Activity " + activity.getActivityID() + " has finished.");//T4
+                System.out.println("Student " + this.getStudentID() + " is notified that Activity " + activity.getActivityID() + " has finished.");//T4
 
             } else if (actionType.equals(ManagementActionType.ACTIVITY_CANCELLED)){
 
                 this.registeredActivities.remove(activity); //T2: Remove activity
-                System.out.println(this.getStudentID() + " is notified that Activity " + activity.getActivityID() + " has cancelled.");//T4
+                System.out.println("Student " +this.getStudentID() + " is notified that Activity " + activity.getActivityID() + " has cancelled.");//T4
             }
 
 

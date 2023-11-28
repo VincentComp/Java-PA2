@@ -117,25 +117,93 @@ public class MainSystem {
      * TODO: Part 3 Task 6: Implement getStudent(String studentID) and getActivity(String activityID) use lambda expression and/or functional programming
     * */
     // Start from here
+    Student getStudent(String studentID){
+        return students.stream().filter(s->s.getStudentID().equals(studentID)).findFirst().orElse(null); //Generate by GPT(by copy the above statement)
+    }
+
+    Activity getActivity(String activityCode){
+        return activities.stream().filter(a->a.getActivityID().equals(activityCode)).findFirst().orElse(null);//Generate by GPT(by copy the above statement)
+    }
 
     /**
     * TODO: Part 3 Task 7: Implement following methods using lambda expression and/or functional programming
     * */
-    public List<Student>  searchStudentByIntegerConditionLambda(QueryAction<Integer> query) {
-        return null; // You can remove this line
+    public List<Student>  searchStudentByIntegerConditionLambda(QueryAction<Integer> query) {//Main5.1
+        Integer condition = query.getCondition();
+        QueryActionType actionType = query.getAction();
+
+        switch (actionType){
+            case YEAR_IS:
+                return students.stream().filter(s->s.getYearOfStudy() == condition).toList();
+            case REMAINING_DURATION_LARGER_THAN:
+                return students.stream().filter(s->(s.getTotalDurationRequired()-s.getPassedDuration())>condition).toList();
+            case REMAINING_DURATION_SMALLER_THAN:
+                return students.stream().filter(s->(s.getTotalDurationRequired()-s.getPassedDuration())<condition).toList();
+        }
+        return null;// You can remove this line
     }
 
     /**
      * TODO: Part 3 Task 7
      * */
     public List<Activity> searchActivityByStringConditionLambda(QueryAction<String> query){
+
+        String condition = query.getCondition();
+        QueryActionType actionType = query.getAction();
+
+        switch(actionType){
+            case ID_CONTAINS:
+                return activities.stream().filter(a->a.getActivityID().contains(condition)).toList();
+
+            case SERVICE_UNIT_IS:
+                return activities.stream().filter(a->a.getServiceUnit().equals(condition)).toList();
+
+            case PREREQUISITE_CONTAINS:
+                return activities.stream().filter(a->a.getTargetStudentDepartments().contains(condition)).toList();
+        }
+
         return null; // You can remove this line
     }
 
     /**
      * TODO: Part 3 Task 7
      * */
+    /*
+        Condition:
+        True :Ascending order
+        False:Descending order
+
+        Action:
+        DURATION_CAPACITY
+        CAPACITY_DURATION
+     */
     public List<Activity> sortActivityByBooleanConditionByLambda(QueryAction<Boolean> query) {
+        Boolean condition = query.getCondition();
+        QueryActionType actionType = query.getAction();
+
+        int order = condition?1:-1; //Check Order
+
+        switch (actionType){
+            case DURATION_CAPACITY:
+                return activities.stream().sorted((activity1,activity2)->{
+                    if(activity1.getDuration() == activity2.getDuration())
+                        //if same duration -> check capacity
+                        return Integer.compare(activity1.getCapacity(),activity2.getCapacity())*order;
+                    else
+                        //simply check duration
+                        return Integer.compare(activity1.getDuration(),activity2.getDuration())*order;
+                }).toList();
+
+            case CAPACITY_DURATION:
+                return activities.stream().sorted((activity1,activity2)->{
+                    if(activity1.getCapacity() == activity2.getCapacity())
+                        //if same capacity -> check duration
+                        return Integer.compare(activity1.getDuration(),activity2.getDuration())*order;
+                    else
+                        //simply check capacity
+                        return Integer.compare(activity1.getCapacity(),activity2.getCapacity())*order;
+                }).toList();
+        }
         return null; // You can remove this line
     }
 
@@ -213,7 +281,7 @@ public class MainSystem {
     /**
      * TODO: Part 3 Task 8: Finish this method
      */
-    public void processQuery(String fileName) throws IOException {
+    public void processQuery(String fileName) throws IOException {//Main5(cont') jump from main
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -221,8 +289,51 @@ public class MainSystem {
                 QueryActionType actType = QueryActionType.valueOf(parts[0]);
                 String rawCondition = parts[1];
                 // TODO: Start from here
+
+                switch (actType){
+                    case YEAR_IS: case REMAINING_DURATION_SMALLER_THAN: case REMAINING_DURATION_LARGER_THAN:
+                        Integer Integer_Condition = Integer.parseInt(rawCondition);
+
+                        List<Student> Integer_result = searchStudentByIntegerConditionLambda(new QueryAction<Integer>(actType,Integer_Condition));
+                        PrintResult_Student(Integer_result);
+
+
+                        break;
+
+                    case ID_CONTAINS: case SERVICE_UNIT_IS:case PREREQUISITE_CONTAINS:
+                        String String_Condition = rawCondition;
+                        List<Activity> String_result = searchActivityByStringConditionLambda(new QueryAction<String>(actType,String_Condition));
+                        PrintResult_Activity(String_result);
+                        break;
+
+                    case DURATION_CAPACITY:case CAPACITY_DURATION:
+                        Boolean Boolean_Condition = Boolean.parseBoolean(rawCondition);
+                        List<Activity> Boolean_result = sortActivityByBooleanConditionByLambda(new QueryAction<Boolean>(actType,Boolean_Condition));
+                        PrintResult_Activity(Boolean_result);
+                        break;
+                }
+
                 // ...
             }
+        }
+    }
+
+    void PrintResult_Student(List<Student> result){
+        for(int i = 0; i< result.size();i++){
+            if(i == result.size()-1)
+                System.out.print(result.get(i).getStudentID() +"\n");
+            else
+                System.out.print(result.get(i).getStudentID() + ", ");
+
+        }
+    }
+
+    void PrintResult_Activity(List<Activity> result){
+        for(int i = 0; i <result.size(); i++){
+            if(i== result.size()-1)
+                System.out.print(result.get(i).getActivityID() +"\n");
+            else
+                System.out.print(result.get(i).getActivityID() + ", ");
         }
     }
 
@@ -234,12 +345,21 @@ public class MainSystem {
         // Part 1: Parallel Registration
         System.out.println("=============== Part 1 ===============");
         system.processRegistration("input/registrationActions.txt"); //Main3: process processRegistration
+        //system.Debugpart1();//Self-defined
         System.out.println("Part 1 Finished");
         // Part 2: Sequential Event Management
         System.out.println("=============== Part 2 ===============");
         system.processManagement("input/managementActions.txt"); //Main4: processManagement
         // Part 3: Functional Information Retrieval
         System.out.println("=============== Part 3 ===============");
-        system.processQuery("input/queryActions.txt");
+        system.processQuery("input/queryActions.txt"); //Main5: process query
+    }
+
+    //Self defined debug
+    void Debugpart1(){
+        for(Activity activity: activities){
+            System.out.println( activity.getActivityID()+", " + activity.getServiceUnit()+ ", " + activity.getDuration() + ", " + activity.getCapacity() +", " + activity.getTargetStudentDepartments() + ", " + activity.getRegisteredStudents());
+        }
     }
 }
+

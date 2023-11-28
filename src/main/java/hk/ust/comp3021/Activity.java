@@ -67,7 +67,7 @@ public class Activity {
     public synchronized boolean enroll(Student s){
 
 
-        if((targetStudentDepartments.size() != 0) && (targetStudentDepartments.contains(s.getDepartment())))
+        if((targetStudentDepartments.size() != 0) && (!targetStudentDepartments.contains(s.getDepartment())))
             return false;//Check1: Not fulfil the requirement
 
         if(registeredStudents.contains(s))
@@ -140,5 +140,22 @@ public class Activity {
         if (this.state == ActivityState.OPEN){
             this.state = s;
         }
+    }
+
+    //debug usage
+    public String getRegisteredStudents() {
+        String student_list= "[";
+        for(int i = 0; i < registeredStudents.size(); i++) {
+
+            if (i == registeredStudents.size() - 1)
+                student_list += registeredStudents.get(i).getStudentID();
+            else
+                student_list += (registeredStudents.get(i).getStudentID() + " ");
+
+        }
+
+        student_list+= "]";
+        return student_list;
+
     }
 }
